@@ -1,13 +1,22 @@
 #include "Ball.h"
 
-Ball::Ball(float x, float y, int rad, int mass, const SDL_Color* color) {
+Ball::Ball(float x, float y, int rad, const SDL_Color* color) {
 	this->xPos = x;
 	this->yPos = y;
-	this->radius = rad;
-	this->mass = mass;
+	if (rad < 10) {
+		radius = 10;
+	}
+	else if (rad > 80) {
+		radius = 80;
+	}
+	else {
+		this->radius = rad;
+	}
+	this->mass = (radius*radius)/50;
+	
 	this->color = color;
 
-	xVel = 0; yVel = 0; xAcc = 0; yAcc = 0;
+	xVel = 0; yVel = 0; xAcc = 2; yAcc = -G;
 }
 
 void Ball::setPos(float x, float y) {
@@ -49,18 +58,25 @@ float Ball::getYAcceleration() {
 	return yAcc;
 }
 
-void Ball::setRadius(int rad) {
-	this->radius = rad;
-}
 int Ball::getRadius() {
 	return radius;
 }
-
-void Ball::setMass(int mass) {
-	this->mass = mass;
-}
 int Ball::getMass() {
 	return mass;
+}
+void Ball::setSize(int radius) {
+	//radius to mass: 1/50 r^2 = m
+	if (radius >= 10 && radius<80) {
+		this->radius = radius;
+		this->mass = (radius * radius) / 50;
+	}
+}
+
+const SDL_Color* Ball::getColor() {
+	return color;
+}
+void Ball::setColor(const SDL_Color* color) {
+	this->color = color;
 }
 
 void Ball::renderGhost() {
@@ -82,14 +98,6 @@ void Ball::renderGhost() {
 		}
 	}
 }
-
-void Ball::updatePos() {
-	xPos += xVel*deltaTime;
-	yPos += yVel*deltaTime;
-	xVel += xAcc*deltaTime;
-	yVel += yAcc*deltaTime;
-}
-
 void Ball::render() {
 	SDL_SetRenderDrawColor(renderer, color->r, color->g, color->b, 255);
 	
@@ -109,7 +117,6 @@ void Ball::render() {
 		}
 	}
 }
-
 void Ball::renderSkeleton() {
 	SDL_SetRenderDrawColor(renderer, color->r, color->g, color->b, color->a);
 
@@ -132,4 +139,41 @@ void Ball::renderSkeleton() {
 			dx--;
 		}
 	}
+}
+
+void Ball::updatePos() {
+
+
+	xVel += xAcc * deltaTime;
+	yVel += yAcc * deltaTime;
+
+	xPos += xVel * deltaTime;
+	yPos += yVel * deltaTime;
+
+
+	handleCollision();
+}
+
+void Ball::handleCollision() {
+	int x = getPixelX();
+	int y = getPixelY();
+
+	if (x - radius < 0) {
+		setPixelPos(radius, getPixelY());
+		xVel = -xVel;
+	}
+	else if (x + radius > SCREEN_WIDTH) {
+		setPixelPos(SCREEN_WIDTH - radius, getPixelY());
+		xVel = -xVel;
+	}
+
+	if (y - radius < 0) {
+		setPixelPos(getPixelX(), radius);
+		yVel = -yVel;
+	}
+	else if (y + radius > SCREEN_HEIGHT) {
+		setPixelPos(getPixelX(), SCREEN_HEIGHT - radius);
+		yVel = -yVel;
+	}
+
 }

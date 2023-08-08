@@ -4,12 +4,12 @@
 class Ball
 {
 private:
-	int radius, mass;
+	int radius, mass; 
 	float xPos, yPos, xVel, yVel, xAcc, yAcc; //in game units (meters basically)
 	const SDL_Color* color;
 
 public:
-	Ball(float x, float y, int radius, int mass, const SDL_Color*);
+	Ball(float x, float y, int radius, const SDL_Color*);
 	
 	void setPos(float, float);
 	void setPixelPos(int, int);
@@ -23,12 +23,14 @@ public:
 	float getYVelocity();
 	float getXAcceleration();
 	float getYAcceleration();
-	void setRadius(int);
 	int getRadius();
-	void setMass(int);
 	int getMass();
+	void setSize(int radius);
+	const SDL_Color* getColor();
+	void setColor(const SDL_Color*);
 
 	void updatePos();
+	void handleCollision();
 
 	void renderGhost();
 	void render();

@@ -1,10 +1,9 @@
 #include "const.h"
 #include "Ball.h"
 
-int running = 1;
 
 /*
-* GOALS: create bounds
+* GOALS: create collision with bounds and make bouncing balls.
 * 
 * GOAL 2: implement basic game state swap - FIRST PROTOTYPE. place balls, scroll to change mass & size
 *		  collisions, ghost ball hovering, prohibit balls from being in other balls initially.
@@ -13,11 +12,15 @@ int running = 1;
 
 //UNITS SPACE: x: [0, ~35.5], y: [0, 20]
 
+int running = 1;
+std::vector<Ball*> balls;
+Ball* holding;
+
 int main() {
 	SDL_Event event;	
 	initSDL();
-
-	Ball ball(UNIT_WIDTH, 20, 50, 5, &AMETHYST);
+	
+	holding = new Ball(10, 10, 20, &BLUE);
 
 	while (running) {
 		//deltaTime
@@ -28,14 +31,22 @@ int main() {
 			parseInput(&event);
 		}
 		
-		ball.updatePos();
+		for (Ball* b : balls) {
+			b->updatePos();
+		}
 
 		//capsFPS
 		wait();
 
 		//render
 		clearScreen(BLACK);
-		ball.render();
+
+		for (Ball* b : balls) {
+			b->render();
+		}
+		holding->renderGhost();
+		
+
 		SDL_RenderPresent(renderer);
 	}
 

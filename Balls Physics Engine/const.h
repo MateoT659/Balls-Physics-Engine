@@ -6,6 +6,9 @@
 #include <math.h>
 #include <iostream>
 #include <vector>
+#include "Ball.h"
+
+class Ball;
 
 enum State {
 	SETBALLS, SETFORCES, SETGRAVITY, EXECUTE
@@ -23,7 +26,10 @@ extern SDL_Renderer* renderer;
 extern int running;
 extern float deltaTime;
 
-const float G = 9.8f;
+extern std::vector<Ball*> balls;
+extern Ball* holding;
+
+const float G = 2*9.8f;
 
 const SDL_Color WHITE = { 255, 255, 255, 255 };
 const SDL_Color BLACK = { 0, 0, 0, 255 };
