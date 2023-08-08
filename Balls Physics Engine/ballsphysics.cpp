@@ -3,10 +3,10 @@
 
 
 /*
-* GOALS: create collision with bounds and make bouncing balls.
+* GOALS: balls collision.
 * 
-* GOAL 2: implement basic game state swap - FIRST PROTOTYPE. place balls, scroll to change mass & size
-*		  collisions, ghost ball hovering, prohibit balls from being in other balls initially.
+* GOAL 2: implement basic game state swap - FIRST PROTOTYPE.
+*		  collisions,  prohibit balls from being in other balls initially.
 */
 
 
