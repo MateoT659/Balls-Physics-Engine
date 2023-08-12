@@ -1,5 +1,4 @@
 #include "const.h"
-#include "Ball.h"
 
 
 /*
@@ -10,7 +9,7 @@
 */
 
 
-//UNITS SPACE: x: [0, ~35.5], y: [0, 20]
+//UNITS SPACE: x: [0, ~17.7], y: [0, 10], each unit rep. 1 meter
 
 int running = 1;
 std::vector<Ball*> balls;
@@ -19,34 +18,38 @@ Ball* holding;
 int main() {
 	SDL_Event event;	
 	initSDL();
+	int c = 0;
 	
-	holding = new Ball(10, 10, 20, &BLUE);
+	
+
+	holding = new Ball(10, 10, 20, &GREEN);
 
 	while (running) {
-		//deltaTime
 		updateDeltaTime();
 
-		//input-update
+		//input
 		while (SDL_PollEvent(&event)) {
 			parseInput(&event);
 		}
 		
+		//update
 		for (Ball* b : balls) {
 			b->updatePos();
 		}
 
-		//capsFPS
+		for (int i = 0; i < balls.size(); i++) {
+			for (int j = i + 1; j < balls.size(); j++) {
+				if (balls[i]->collidesWith(balls[j])) {
+					handleCollision(balls[i], balls[j]);
+				}
+			}
+		}
+
+		//caps FPS
 		wait();
 
 		//render
-		clearScreen(BLACK);
-
-		for (Ball* b : balls) {
-			b->render();
-		}
-		holding->renderGhost();
-		
-
+		renderBalls();
 		SDL_RenderPresent(renderer);
 	}
 

@@ -6,9 +6,12 @@
 #include <math.h>
 #include <iostream>
 #include <vector>
+
+#include "Vec2.h"
 #include "Ball.h"
 
 class Ball;
+class Vec2;
 
 enum State {
 	SETBALLS, SETFORCES, SETGRAVITY, EXECUTE
@@ -18,7 +21,7 @@ const int SCREEN_HEIGHT = 720;
 const int SCREEN_WIDTH = 1280;
 const float RATIO = (float)SCREEN_WIDTH / SCREEN_HEIGHT;
 
-const int UNIT_HEIGHT = 20;
+const int UNIT_HEIGHT = 10;
 const int UNIT_WIDTH = (int)(UNIT_HEIGHT * RATIO);
 
 extern SDL_Window* window;
@@ -29,7 +32,8 @@ extern float deltaTime;
 extern std::vector<Ball*> balls;
 extern Ball* holding;
 
-const float G = 2*9.8f;
+const float G = 9.8f;
+const float AIR_RESISTANCE = .002f;
 
 const SDL_Color WHITE = { 255, 255, 255, 255 };
 const SDL_Color BLACK = { 0, 0, 0, 255 };
@@ -50,7 +54,11 @@ void parseInput(SDL_Event* event);
 
 //graphics.cpp
 void clearScreen(SDL_Color);
+void renderBalls();
 
 //gameloop.cpp
 void updateDeltaTime(void);
 void wait(void);
+
+//physics.cpp
+void handleCollision(Ball*, Ball*);

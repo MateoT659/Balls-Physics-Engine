@@ -3,37 +3,38 @@
 
 class Ball
 {
+public:
+	Vec2 pos; //in game units (meters basically)
+	Vec2 vel; 
 private:
-	int radius, mass; 
-	float xPos, yPos, xVel, yVel, xAcc, yAcc; //in game units (meters basically)
+	int radius;
+	float mass; 
 	const SDL_Color* color;
 
 public:
 	Ball(float x, float y, int radius, const SDL_Color*);
 	
 	void setPos(float, float);
+	void setPos(Vec2);
 	void setPixelPos(int, int);
-	float getX();
-	float getY();
-	float* getXptr();
-	float* getYptr();
+	void setPixelPos(Vec2);
+	void pixelMoveX(int x);
+	void pixelMoveY(int y);
+	Vec2 getPixelPos();
 	int getPixelX();
 	int getPixelY();
-	float getXVelocity();
-	float getYVelocity();
-	float getXAcceleration();
-	float getYAcceleration();
 	int getRadius();
-	int getMass();
+	float getMass();
 	void setSize(int radius);
 	const SDL_Color* getColor();
 	void setColor(const SDL_Color*);
 
 	void updatePos();
-	void handleCollision();
+	void handleWall();
+	bool collidesWith(Ball*);
+	void applyForceTo(Ball*);
 
 	void renderGhost();
 	void render();
 	void renderSkeleton();
 };
-

@@ -1,8 +1,11 @@
 #include "Ball.h"
 
 Ball::Ball(float x, float y, int rad, const SDL_Color* color) {
-	this->xPos = x;
-	this->yPos = y;
+	pos.x = x;
+	pos.y = y;
+	vel.x = 0;
+	vel.y = 0;
+
 	if (rad < 10) {
 		radius = 10;
 	}
@@ -12,63 +15,55 @@ Ball::Ball(float x, float y, int rad, const SDL_Color* color) {
 	else {
 		this->radius = rad;
 	}
-	this->mass = (radius*radius)/50;
+	this->mass = radius/2.f;
 	
 	this->color = color;
-
-	xVel = 0; yVel = 0; xAcc = 2; yAcc = -G;
 }
 
 void Ball::setPos(float x, float y) {
-	this->xPos = x;
-	this->yPos = y;
+	pos.x = x;
+	pos.y = y;
+}
+void Ball::setPos(Vec2 pos) {
+	this->pos = pos;
 }
 void Ball::setPixelPos(int x, int y) {
-	this->xPos = (x * (float)UNIT_WIDTH / SCREEN_WIDTH);
-	this->yPos = UNIT_HEIGHT - (y * (float)UNIT_HEIGHT / SCREEN_HEIGHT);
+	pos.x = (x * (float)UNIT_WIDTH / SCREEN_WIDTH);
+	pos.y = UNIT_HEIGHT - (y * (float)UNIT_HEIGHT / SCREEN_HEIGHT);
 }
-float Ball::getX() {
-	return xPos;
+void Ball::setPixelPos(Vec2 pix) {
+	pos.x = (pix.x * (float)UNIT_WIDTH / SCREEN_WIDTH);
+	pos.y = UNIT_HEIGHT - (pix.y * (float)UNIT_HEIGHT / SCREEN_HEIGHT);
 }
-float Ball::getY() {
-	return yPos;
+void Ball::pixelMoveX(int x) {
+	pos.x += x * (float)UNIT_WIDTH / SCREEN_WIDTH;
+} 
+void Ball::pixelMoveY(int y) {
+	pos.y -= y * (float)UNIT_HEIGHT / SCREEN_HEIGHT;
 }
-float* Ball::getXptr() {
-	return &xPos;
-}
-float* Ball::getYptr() {
-	return &yPos;
-}
+
 int Ball::getPixelX() {
-	return (int)(xPos * SCREEN_WIDTH / UNIT_WIDTH) ;
+	return (int)(pos.x * SCREEN_WIDTH / UNIT_WIDTH) ;
 }
 int Ball::getPixelY() {
-	return SCREEN_HEIGHT - (int)(yPos * SCREEN_HEIGHT / UNIT_HEIGHT) ;
+	return SCREEN_HEIGHT - (int)(pos.y * SCREEN_HEIGHT / UNIT_HEIGHT) ;
 }
-float Ball::getXVelocity(){
-	return xVel;
-}
-float Ball::getXAcceleration() {
-	return xAcc;
-}
-float Ball::getYVelocity() {
-	return yVel;
-}
-float Ball::getYAcceleration() {
-	return yAcc;
+
+Vec2 Ball::getPixelPos() {
+	return Vec2((int)(pos.x * SCREEN_WIDTH / UNIT_WIDTH), SCREEN_HEIGHT - (int)(pos.y * SCREEN_HEIGHT / UNIT_HEIGHT));
 }
 
 int Ball::getRadius() {
 	return radius;
 }
-int Ball::getMass() {
+float Ball::getMass() {
 	return mass;
 }
 void Ball::setSize(int radius) {
-	//radius to mass: 1/50 r^2 = m
+	//radius to mass: r/2 = m
 	if (radius >= 10 && radius<80) {
 		this->radius = radius;
-		this->mass = (radius * radius) / 50;
+		this->mass = radius/2.f;
 	}
 }
 
@@ -80,11 +75,10 @@ void Ball::setColor(const SDL_Color* color) {
 }
 
 void Ball::renderGhost() {
-
-	int x = getPixelX();
-	int y = getPixelY();
-
 	SDL_SetRenderDrawColor(renderer, color->r, color->g, color->b, 100);
+	
+	Vec2 pix = getPixelPos();
+
 	for (int w = 0; w < radius * 2; w++)
 	{
 		for (int h = 0; h < radius * 2; h++)
@@ -93,7 +87,7 @@ void Ball::renderGhost() {
 			int dy = radius - h; // vertical offset
 			if ((dx * dx + dy * dy) <= (radius * radius))
 			{
-				SDL_RenderDrawPoint(renderer, x + dx, y + dy);
+				SDL_RenderDrawPoint(renderer, (int)pix.x + dx, (int)pix.y + dy);
 			}
 		}
 	}
@@ -101,8 +95,7 @@ void Ball::renderGhost() {
 void Ball::render() {
 	SDL_SetRenderDrawColor(renderer, color->r, color->g, color->b, 255);
 	
-	int x = getPixelX();
-	int y = getPixelY();
+	Vec2 pix = getPixelPos();
 
 	for (int w = 0; w < radius * 2; w++)
 	{
@@ -112,7 +105,7 @@ void Ball::render() {
 			int dy = radius - h; // vertical offset
 			if ((dx * dx + dy * dy) <= (radius * radius))
 			{
-				SDL_RenderDrawPoint(renderer, x + dx, y + dy);
+				SDL_RenderDrawPoint(renderer, (int)pix.x + dx, (int)pix.y + dy);
 			}
 		}
 	}
@@ -120,8 +113,10 @@ void Ball::render() {
 void Ball::renderSkeleton() {
 	SDL_SetRenderDrawColor(renderer, color->r, color->g, color->b, color->a);
 
-	int x = getPixelX();
-	int y = getPixelY();
+
+	Vec2 pix = getPixelPos();
+	int x = (int)pix.x;
+	int y  = (int)pix.y;
 
 	int dx = radius, dy = 0;
 
@@ -142,38 +137,48 @@ void Ball::renderSkeleton() {
 }
 
 void Ball::updatePos() {
+	
+	
 
+	vel.y += -G * deltaTime;
 
-	xVel += xAcc * deltaTime;
-	yVel += yAcc * deltaTime;
+	vel = vel * (1 - AIR_RESISTANCE);
+	if (abs(vel.x) < 0.05) {
+		vel.x = 0;
+	}
+	if (abs(vel.y) < 0.05) {
+		vel.y = 0;
+	}
+	pos += vel * deltaTime;
 
-	xPos += xVel * deltaTime;
-	yPos += yVel * deltaTime;
-
-
-	handleCollision();
+	handleWall();
 }
 
-void Ball::handleCollision() {
+void Ball::handleWall() {
 	int x = getPixelX();
 	int y = getPixelY();
 
 	if (x - radius < 0) {
 		setPixelPos(radius, getPixelY());
-		xVel = -xVel;
+		vel.x *= -1;
 	}
 	else if (x + radius > SCREEN_WIDTH) {
 		setPixelPos(SCREEN_WIDTH - radius, getPixelY());
-		xVel = -xVel;
+		vel.x *= -1;
 	}
 
 	if (y - radius < 0) {
 		setPixelPos(getPixelX(), radius);
-		yVel = -yVel;
+		vel.y *= -1;
 	}
 	else if (y + radius > SCREEN_HEIGHT) {
 		setPixelPos(getPixelX(), SCREEN_HEIGHT - radius);
-		yVel = -yVel;
+		vel.y *= -1;
 	}
 
+}
+
+bool Ball::collidesWith(Ball* other) {
+	Vec2 dist = getPixelPos() - other->getPixelPos();
+	return dist.mag2() < (radius + other->radius) * (radius + other->radius);
 }
