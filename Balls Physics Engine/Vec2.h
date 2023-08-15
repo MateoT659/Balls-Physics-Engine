@@ -17,6 +17,7 @@ public:
 	double mag();
 	double mag2();
 	Vec2 getPerp();
+	Vec2 getUnit();
 	Vec2 getProjectionOn(Vec2);
 	
 
@@ -28,6 +29,7 @@ public:
 	Vec2 operator+(Vec2); //addition operator
 	Vec2 operator-(Vec2); //subtraction operator
 	Vec2 operator*(double); //float multiplication
+	Vec2 operator/(double c); //float div
 	Vec2 operator*(int); //int multiplication
 
 	std::string toString();

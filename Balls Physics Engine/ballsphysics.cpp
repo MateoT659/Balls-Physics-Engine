@@ -14,15 +14,14 @@
 int running = 1;
 std::vector<Ball*> balls;
 Ball* holding;
+State currentState;
 
 int main() {
-	SDL_Event event;	
+	SDL_Event event;
 	initSDL();
-	int c = 0;
+	currentState = SETBALLS;
 	
-	
-
-	holding = new Ball(10, 10, 20, &GREEN);
+	holding = new Ball(10, 10, 20, &YELLOW);
 
 	while (running) {
 		updateDeltaTime();
@@ -33,14 +32,15 @@ int main() {
 		}
 		
 		//update
-		for (Ball* b : balls) {
-			b->updatePos();
-		}
-
-		for (int i = 0; i < balls.size(); i++) {
-			for (int j = i + 1; j < balls.size(); j++) {
-				if (balls[i]->collidesWith(balls[j])) {
-					handleCollision(balls[i], balls[j]);
+		if (currentState == RUNNING) {
+			for (Ball* b : balls) {
+				b->updatePos();
+			}
+			for (int i = 0; i < balls.size(); i++) {
+				for (int j = i + 1; j < balls.size(); j++) {
+					if (balls[i]->collidesWith(balls[j])) {
+						handleCollision(balls[i], balls[j]);
+					}
 				}
 			}
 		}
@@ -49,7 +49,7 @@ int main() {
 		wait();
 
 		//render
-		renderBalls();
+		render();
 		SDL_RenderPresent(renderer);
 	}
 

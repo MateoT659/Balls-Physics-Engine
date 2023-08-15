@@ -14,7 +14,7 @@ class Ball;
 class Vec2;
 
 enum State {
-	SETBALLS, SETFORCES, SETGRAVITY, EXECUTE
+	SETBALLS, SETFORCES, SETGRAVITY, RUNNING
 };
 
 const int SCREEN_HEIGHT = 720;
@@ -28,6 +28,7 @@ extern SDL_Window* window;
 extern SDL_Renderer* renderer;
 extern int running;
 extern float deltaTime;
+extern State currentState;
 
 extern std::vector<Ball*> balls;
 extern Ball* holding;
@@ -53,8 +54,13 @@ void initSDL();
 void parseInput(SDL_Event* event);
 
 //graphics.cpp
+SDL_Color interpolateColors(SDL_Color, SDL_Color, double);
+void render();
+void renderIcon();
 void clearScreen(SDL_Color);
 void renderBalls();
+void drawCircle(Vec2, int, SDL_Color);
+void drawArrow(Vec2 from, Vec2 to, SDL_Color color);
 
 //gameloop.cpp
 void updateDeltaTime(void);
@@ -62,3 +68,5 @@ void wait(void);
 
 //physics.cpp
 void handleCollision(Ball*, Ball*);
+Vec2 pixelToGame(Vec2);
+Vec2 gameToPixel(Vec2);

@@ -31,3 +31,10 @@ void handleCollision(Ball* ball, Ball* other) {
 
 	applyForces(ball, other);
 }
+
+Vec2 pixelToGame(Vec2 coords) {
+	return Vec2((coords.x * (float)UNIT_WIDTH / SCREEN_WIDTH), UNIT_HEIGHT - (coords.y * (float)UNIT_HEIGHT / SCREEN_HEIGHT));
+}
+Vec2 gameToPixel(Vec2 coords) {
+	return Vec2((int)(coords.x * (float)SCREEN_WIDTH / UNIT_WIDTH), SCREEN_HEIGHT - (int)(coords.y * (float)SCREEN_HEIGHT / UNIT_HEIGHT));
+}

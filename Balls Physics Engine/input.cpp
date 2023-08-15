@@ -4,13 +4,14 @@ SDL_Window* window;
 SDL_Renderer* renderer;
 
 void changeColor(SDL_Event*);
+bool changeState(SDL_Event*);
 
-void parseInput(SDL_Event* event) {
+void parseSetBalls(SDL_Event* event) {
 	int x, y;
 	switch (event->type) {
 	case SDL_KEYDOWN:
-		if (event->key.keysym.sym == SDLK_ESCAPE) {
-			running = 0; //exit application
+		if (changeState(event)) {
+			return;
 		}
 		else {
 			changeColor(event);
@@ -26,10 +27,17 @@ void parseInput(SDL_Event* event) {
 			balls.push_back(holding);
 			holding = new Ball((float)x, (float)y, holding->getRadius(), holding->getColor());
 		}
+		else if (event->button.button == SDL_BUTTON_RIGHT) {
+			for (int i = 0; i < balls.size(); i++) {
+				if (balls[i]->isClicked(x, y)) {
+					balls.erase(balls.begin() + i);
+				}
+			}
+		}
 		break;
 	case SDL_MOUSEWHEEL:
 		if (event->wheel.y > 0) {
-			holding->setSize((int)(1.1*holding->getRadius()));
+			holding->setSize((int)(1.1 * holding->getRadius()));
 		}
 		else if (event->wheel.y < 0) {
 			holding->setSize((int)(.92 * holding->getRadius()));
@@ -37,9 +45,112 @@ void parseInput(SDL_Event* event) {
 	}
 }
 
-void changeColor(SDL_Event* event) {
-	// exits program on spacebar, or sets color on nums 1-5
+void parseSetForces(SDL_Event* event) {
+	switch (event->type) {
+	case SDL_KEYDOWN:
+		if (changeState(event)) {
+			return;
+		}
+		break;
+	case SDL_MOUSEBUTTONDOWN: 
+		int x, y;
+		Ball* pressed = nullptr;
+		SDL_GetMouseState(&x, &y);
+		switch (event->button.button) {
+		case SDL_BUTTON_LEFT:
+			for (int i = 0; i < balls.size() && pressed == nullptr; i++) {
+				if (balls[i]->isClicked(x, y)) {
+					pressed = balls[i];
+				}
+			}
+			if (pressed != nullptr) {
+				while (event->type != SDL_MOUSEBUTTONUP || event->button.button != SDL_BUTTON_LEFT) {
+					SDL_PollEvent(event);
+				}
+				SDL_GetMouseState(&x, &y);
+				Vec2 end = pixelToGame(Vec2(x, y));
+				pressed->vel = (end - pressed->pos)*2;
+			}
+			break;
+		case SDL_BUTTON_RIGHT:
+			for (Ball* b : balls) {
+				if (b->isClicked(x, y)) {
+					b->vel = Vec2();
+				}
+			}
+			break;
+		}
+		break;
+	}
+}
 
+void parseSetGravity(SDL_Event* event) {
+	switch (event->type) {
+	case SDL_KEYDOWN:
+		if (changeState(event)) {
+			return;
+		}
+		break;
+	}
+}
+
+void parseRunning(SDL_Event* event) {
+	switch (event->type) {
+	case SDL_KEYDOWN:
+		if (event->key.keysym.sym == SDLK_SPACE) {
+			currentState = SETBALLS;
+			return;
+		}
+		else if (changeState(event)) {
+			return;
+		}
+
+	}
+}
+
+void parseInput(SDL_Event* event) {
+	if (event->key.keysym.sym == SDLK_ESCAPE) {
+		running = 0; return; //check exit
+	}
+
+	switch (currentState) {
+	case SETBALLS:
+		int x, y;
+		SDL_GetMouseState(&x, &y);
+		holding->setPixelPos(x, y);
+		parseSetBalls(event);
+		break;
+	case SETFORCES:
+		parseSetForces(event);
+		break;
+	case SETGRAVITY:
+		parseSetGravity(event);
+		break;
+	case RUNNING:
+		parseRunning(event);
+		break;
+	}
+}
+
+bool changeState(SDL_Event* event) {
+	switch (event->key.keysym.sym) {
+	case SDLK_b:
+		currentState = SETBALLS;
+		return true;
+	case SDLK_v:
+		currentState = SETFORCES;
+		return true;
+	case SDLK_g:
+		currentState = SETGRAVITY;
+		return true;
+	case SDLK_SPACE:
+		currentState = RUNNING;
+		return true;
+	}
+	return false;
+}
+
+void changeColor(SDL_Event* event) {
 	switch (event->key.keysym.sym) {
 	case SDLK_1:
 		holding->setColor(&WHITE);

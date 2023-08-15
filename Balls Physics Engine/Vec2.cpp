@@ -37,7 +37,15 @@ double Vec2::mag2() {
 Vec2 Vec2::getPerp() {
 	return Vec2(-y, x);
 }
+Vec2 Vec2::getUnit()
+{
+	double magn = mag();
+	
+	return magn == 0? Vec2() : *this/mag();
+}
 Vec2 Vec2::getProjectionOn(Vec2 other){
+	double mag2n = other.mag2();
+	if (mag2n == 0) return Vec2();
 	return other * ((*this * other) / other.mag2());
 }
 
@@ -55,6 +63,9 @@ Vec2 Vec2::operator*(int c) {
 }
 double Vec2::operator*(Vec2 other) {
 	return x* other.x + y * other.y;;
+}
+Vec2 Vec2::operator/(double c) {
+	return Vec2(x / c, y / c);
 }
 void Vec2::operator+=(Vec2 other) {
 	add(other);

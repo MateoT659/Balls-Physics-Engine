@@ -74,6 +74,15 @@ void Ball::setColor(const SDL_Color* color) {
 	this->color = color;
 }
 
+bool Ball::isClicked(int x, int y)
+{
+	Vec2 pix = getPixelPos();
+	Vec2 pos(x, y);
+
+	return (pos - pix).mag2() < radius * radius;
+	
+}
+
 void Ball::renderGhost() {
 	SDL_SetRenderDrawColor(renderer, color->r, color->g, color->b, 100);
 	
@@ -134,6 +143,15 @@ void Ball::renderSkeleton() {
 			dx--;
 		}
 	}
+}
+
+void Ball::renderVelocityVec(){ // for showing velocity vectors during RUNNING, not accurate
+	double magn = vel.mag();
+
+	if (magn == 0) return;
+
+	double scale = (4 / -(magn + 2)) + 2;
+	drawArrow(getPixelPos(), gameToPixel(pos + vel*scale/magn), interpolateColors(YELLOW, ORANGE, scale/2));
 }
 
 void Ball::updatePos() {
