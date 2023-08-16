@@ -16,6 +16,9 @@ class Vec2;
 enum State {
 	SETBALLS, SETFORCES, SETGRAVITY, RUNNING
 };
+enum GravityDirection {
+	UP, DOWN, LEFT, RIGHT, ATTRACT, REPEL, NONE
+};
 
 const int SCREEN_HEIGHT = 720;
 const int SCREEN_WIDTH = 1280;
@@ -33,8 +36,16 @@ extern State currentState;
 extern std::vector<Ball*> balls;
 extern Ball* holding;
 
-const float G = 9.8f;
+const float MOON_GRAV = 3.f;
+const float EARTH_GRAV = 9.8f;
+const float SUN_GRAV = 19.6f;
+extern float gravStrength;
+
 const float AIR_RESISTANCE = .002f;
+extern bool airRes;
+extern bool wallCollision;
+extern GravityDirection gravDirection;
+extern Vec2 gravPoint;
 
 const SDL_Color WHITE = { 255, 255, 255, 255 };
 const SDL_Color BLACK = { 0, 0, 0, 255 };
@@ -61,12 +72,15 @@ void clearScreen(SDL_Color);
 void renderBalls();
 void drawCircle(Vec2, int, SDL_Color);
 void drawArrow(Vec2 from, Vec2 to, SDL_Color color);
+void setColor(SDL_Color color, uint8_t alpha);
+void drawSkeleton(Vec2, int, SDL_Color);
 
 //gameloop.cpp
 void updateDeltaTime(void);
 void wait(void);
 
 //physics.cpp
+void updateBalls();
 void handleCollision(Ball*, Ball*);
 Vec2 pixelToGame(Vec2);
 Vec2 gameToPixel(Vec2);

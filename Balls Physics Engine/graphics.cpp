@@ -1,5 +1,9 @@
 #include "const.h"
 
+void setColor(SDL_Color color, uint8_t alpha) {
+	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, alpha);
+}
+
 void clearScreen(SDL_Color color) {
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 	SDL_RenderClear(renderer);
@@ -10,7 +14,15 @@ void renderBallIcon() {
 }
 
 void renderVecIcon() {
-	drawArrow(Vec2(20, SCREEN_HEIGHT - 20), Vec2(60, SCREEN_HEIGHT - 60), ORANGE);
+	drawArrow(Vec2(30, SCREEN_HEIGHT - 30), Vec2(75, SCREEN_HEIGHT - 75), ORANGE);
+	if (airRes) {
+		drawArrow(Vec2(50, SCREEN_HEIGHT-40), Vec2(20, SCREEN_HEIGHT-10), AMETHYST);
+	}
+	if (wallCollision) {
+		setColor(AMETHYST, 255);
+		SDL_Rect rect = { 20,SCREEN_HEIGHT - 75, 20, 20};
+		SDL_RenderDrawRect(renderer, &rect);
+	}
 }
 
 void renderGravIcon() {
@@ -50,6 +62,29 @@ void drawCircle(Vec2 pos, int radius, SDL_Color color) {
 	}
 }
 
+void drawSkeleton(Vec2 pos, int radius, SDL_Color color) {
+	setColor(color, 255);
+	int x = (int)pos.x;
+	int y = (int)pos.y;
+
+	int dx = radius, dy = 0;
+
+	while (dx >= dy) {
+		SDL_RenderDrawPoint(renderer, x + dx, y + dy);
+		SDL_RenderDrawPoint(renderer, x + dy, y + dx);
+		SDL_RenderDrawPoint(renderer, x - dx, y + dy);
+		SDL_RenderDrawPoint(renderer, x - dy, y + dx);
+		SDL_RenderDrawPoint(renderer, x + dx, y - dy);
+		SDL_RenderDrawPoint(renderer, x + dy, y - dx);
+		SDL_RenderDrawPoint(renderer, x - dx, y - dy);
+		SDL_RenderDrawPoint(renderer, x - dy, y - dx);
+		dy++;
+		while (radius * radius < dx * dx + dy * dy) {
+			dx--;
+		}
+	}
+}
+
 void drawArrow(Vec2 from, Vec2 to, SDL_Color color) {
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
 
@@ -77,6 +112,17 @@ void renderBalls() {
 
 void render() {
 	clearScreen(BLACK);
+
+	switch (gravDirection) {
+	case ATTRACT:
+		drawSkeleton(gameToPixel(gravPoint), (int)gravStrength, CYAN);
+		break;
+	case REPEL:
+		drawSkeleton(gameToPixel(gravPoint), (int)gravStrength, RED);
+		break;
+	}
+	//MAKE GRAVITY SPECIFIERS FOR DIRECTIONAL
+
 	renderBalls();
 
 	switch (currentState) {

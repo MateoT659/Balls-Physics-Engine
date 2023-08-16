@@ -1,14 +1,5 @@
 #include "const.h"
 
-
-/*
-* GOALS: balls collision.
-* 
-* GOAL 2: implement basic game state swap - FIRST PROTOTYPE.
-*		  collisions,  prohibit balls from being in other balls initially.
-*/
-
-
 //UNITS SPACE: x: [0, ~17.7], y: [0, 10], each unit rep. 1 meter
 
 int running = 1;
@@ -33,16 +24,7 @@ int main() {
 		
 		//update
 		if (currentState == RUNNING) {
-			for (Ball* b : balls) {
-				b->updatePos();
-			}
-			for (int i = 0; i < balls.size(); i++) {
-				for (int j = i + 1; j < balls.size(); j++) {
-					if (balls[i]->collidesWith(balls[j])) {
-						handleCollision(balls[i], balls[j]);
-					}
-				}
-			}
+			updateBalls();
 		}
 
 		//caps FPS

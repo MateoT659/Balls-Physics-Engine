@@ -1,5 +1,24 @@
 #include "const.h"
 
+bool airRes = true;
+bool wallCollision = true;
+float gravStrength = EARTH_GRAV;
+GravityDirection gravDirection = DOWN;
+Vec2 gravPoint = Vec2();
+
+void updateBalls() {
+	for (Ball* b : balls) {
+		b->updatePos();
+	}
+	for (int i = 0; i < balls.size(); i++) {
+		for (int j = i + 1; j < balls.size(); j++) {
+			if (balls[i]->collidesWith(balls[j])) {
+				handleCollision(balls[i], balls[j]);
+			}
+		}
+	}
+}
+
 void applyForces(Ball* ball, Ball* other) {
 	Vec2 norm = ball->pos - other->pos;
 	Vec2 tang = norm.getPerp();

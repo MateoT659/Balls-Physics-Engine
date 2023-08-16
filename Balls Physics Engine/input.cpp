@@ -51,6 +51,16 @@ void parseSetForces(SDL_Event* event) {
 		if (changeState(event)) {
 			return;
 		}
+		else{
+			switch (event->key.keysym.sym) {
+			case SDLK_a:
+				airRes = !airRes; //MAKE SOME NOTIFIER
+				break;
+			case SDLK_w:
+				wallCollision = !wallCollision;
+				break;
+			}
+		}
 		break;
 	case SDL_MOUSEBUTTONDOWN: 
 		int x, y;
@@ -90,6 +100,45 @@ void parseSetGravity(SDL_Event* event) {
 		if (changeState(event)) {
 			return;
 		}
+		else {
+			switch (event->key.keysym.sym) {
+			case SDLK_0:
+				gravDirection = NONE;
+				break;
+			case SDLK_1:
+				gravStrength = MOON_GRAV;
+				break;
+			case SDLK_2:
+				gravStrength = EARTH_GRAV;
+				break;
+			case SDLK_3:
+				gravStrength = SUN_GRAV;
+				break;
+			case SDLK_RIGHT:
+				gravDirection = RIGHT;
+				break;
+			case SDLK_LEFT:
+				gravDirection = LEFT;
+				break;
+			case SDLK_DOWN:
+				gravDirection = DOWN;
+				break;
+			case SDLK_UP:
+				gravDirection = UP;
+				break;
+			}
+		}
+		break;
+	case SDL_MOUSEBUTTONDOWN:
+		if (event->button.button == SDL_BUTTON_LEFT) {
+			gravDirection = ATTRACT;
+		}
+		else {
+			gravDirection = REPEL;
+		}
+		int x, y;
+		SDL_GetMouseState(&x, &y);
+		gravPoint = pixelToGame(Vec2(x, y));
 		break;
 	}
 }

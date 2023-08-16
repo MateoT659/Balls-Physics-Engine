@@ -122,7 +122,6 @@ void Ball::render() {
 void Ball::renderSkeleton() {
 	SDL_SetRenderDrawColor(renderer, color->r, color->g, color->b, color->a);
 
-
 	Vec2 pix = getPixelPos();
 	int x = (int)pix.x;
 	int y  = (int)pix.y;
@@ -157,10 +156,31 @@ void Ball::renderVelocityVec(){ // for showing velocity vectors during RUNNING, 
 void Ball::updatePos() {
 	
 	
+	switch (gravDirection) { // no case NONE since none wouldn't do anything
+	case DOWN:
+		vel.y -= gravStrength * deltaTime;
+		break;
+	case UP:
+		vel.y += gravStrength * deltaTime;
+		break;
+	case RIGHT:
+		vel.x += gravStrength * deltaTime;
+		break;
+	case LEFT:
+		vel.x -= gravStrength * deltaTime;
+		break;
+	case ATTRACT:
+		vel -= (pos - gravPoint).getUnit() * gravStrength * deltaTime;
+		break;
+	case REPEL:
+		vel += (pos - gravPoint).getUnit() * gravStrength * deltaTime;
+		break;
+	}
+	
+	if (airRes) {
+		vel = vel * (1 - AIR_RESISTANCE);
+	}
 
-	vel.y += -G * deltaTime;
-
-	vel = vel * (1 - AIR_RESISTANCE);
 	if (abs(vel.x) < 0.05) {
 		vel.x = 0;
 	}
@@ -169,7 +189,9 @@ void Ball::updatePos() {
 	}
 	pos += vel * deltaTime;
 
-	handleWall();
+	if (wallCollision) {
+		handleWall();
+	}
 }
 
 void Ball::handleWall() {
