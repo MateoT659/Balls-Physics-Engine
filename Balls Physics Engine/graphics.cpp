@@ -15,8 +15,13 @@ void renderBallIcon() {
 
 void renderVecIcon() {
 	drawArrow(Vec2(30, SCREEN_HEIGHT - 30), Vec2(75, SCREEN_HEIGHT - 75), ORANGE);
-	if (airRes) {
-		drawArrow(Vec2(50, SCREEN_HEIGHT-40), Vec2(20, SCREEN_HEIGHT-10), AMETHYST);
+	switch (airRes) {
+	case 1:
+		drawArrow(Vec2(50, SCREEN_HEIGHT - 40), Vec2(20, SCREEN_HEIGHT - 10), AMETHYST);
+		break;
+	case 2:
+		drawArrow(Vec2(50, SCREEN_HEIGHT - 40), Vec2(20, SCREEN_HEIGHT - 10), RED);
+		break;
 	}
 	if (wallCollision) {
 		setColor(AMETHYST, 255);
@@ -28,6 +33,50 @@ void renderVecIcon() {
 void renderGravIcon() {
 	drawArrow(Vec2(21, SCREEN_HEIGHT - 70), Vec2(63, SCREEN_HEIGHT - 14), CYAN);
 	drawArrow(Vec2(63, SCREEN_HEIGHT - 70), Vec2(21, SCREEN_HEIGHT - 14), CYAN);
+
+	Vec2 from;
+	Vec2 to;
+	Vec2 smChange;
+	Vec2 lChange;
+	switch (gravDirection) {
+	case DOWN:
+		from = Vec2(60, 20);
+		to = Vec2(60, 90);
+		smChange = Vec2(13, 0);
+		lChange = Vec2(25, 0);
+		break;
+	case UP:
+		from = Vec2(60, 90);
+		to = Vec2(60, 20);
+		smChange = Vec2(13, 0);
+		lChange = Vec2(25, 0);
+		break;
+	case RIGHT:
+		from = Vec2(25, 55);
+		to = Vec2(95, 55);
+		smChange = Vec2(0, 13);
+		lChange = Vec2(0, 25);
+		break;
+	case LEFT:
+		from = Vec2(95, 55);
+		to = Vec2(25, 55);
+		smChange = Vec2(0, 13);
+		lChange = Vec2(0, 25);
+		break;
+	}
+	
+	if (gravStrength == SUN_GRAV) {
+		drawArrow(from, to, RED);
+		drawArrow(from+lChange, to+lChange, RED);
+		drawArrow(from-lChange, to-lChange, RED);
+	}
+	else if (gravStrength == EARTH_GRAV) {
+		drawArrow(from+smChange, to+smChange, YELLOW);
+		drawArrow(from-smChange, to-smChange, YELLOW);
+	}
+	else {
+		drawArrow(from, to, CYAN);
+	}
 }
 
 void renderIcon() {
@@ -85,6 +134,27 @@ void drawSkeleton(Vec2 pos, int radius, SDL_Color color) {
 	}
 }
 
+void drawCharge() {
+	Vec2 point = gameToPixel(gravPoint);
+	if (gravStrength == MOON_GRAV) {
+		drawSkeleton(point, 12, CYAN);
+	}
+	else if (gravStrength == EARTH_GRAV) {
+		drawSkeleton(point, 12, YELLOW);
+	}
+	else {
+		drawSkeleton(point, 12, RED);
+	}
+
+	switch (gravDirection) {
+	case REPEL:
+		SDL_RenderDrawLine(renderer, (int)point.x, (int)point.y + 4, (int)point.x, (int)point.y - 4);
+	case ATTRACT:
+		SDL_RenderDrawLine(renderer, (int)point.x + 4, (int)point.y, (int)point.x - 4, (int)point.y);
+		break;
+	}
+}
+
 void drawArrow(Vec2 from, Vec2 to, SDL_Color color) {
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 255);
 
@@ -115,10 +185,8 @@ void render() {
 
 	switch (gravDirection) {
 	case ATTRACT:
-		drawSkeleton(gameToPixel(gravPoint), (int)gravStrength, CYAN);
-		break;
 	case REPEL:
-		drawSkeleton(gameToPixel(gravPoint), (int)gravStrength, RED);
+		drawCharge();
 		break;
 	}
 	//MAKE GRAVITY SPECIFIERS FOR DIRECTIONAL

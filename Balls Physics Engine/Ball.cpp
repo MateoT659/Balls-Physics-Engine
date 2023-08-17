@@ -177,8 +177,13 @@ void Ball::updatePos() {
 		break;
 	}
 	
-	if (airRes) {
-		vel = vel * (1 - AIR_RESISTANCE);
+	switch (airRes) {
+	case 1:
+		vel *= (1 - AIR_RESISTANCE);
+		break;
+	case 2:
+		vel *= (1 - HIGH_RESISTANCE);
+		break;
 	}
 
 	if (abs(vel.x) < 0.05) {

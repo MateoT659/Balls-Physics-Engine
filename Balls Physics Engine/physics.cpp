@@ -1,6 +1,6 @@
 #include "const.h"
 
-bool airRes = true;
+char airRes = 1;
 bool wallCollision = true;
 float gravStrength = EARTH_GRAV;
 GravityDirection gravDirection = DOWN;

@@ -54,7 +54,7 @@ void parseSetForces(SDL_Event* event) {
 		else{
 			switch (event->key.keysym.sym) {
 			case SDLK_a:
-				airRes = !airRes; //MAKE SOME NOTIFIER
+				airRes = (airRes + 1) % 3;
 				break;
 			case SDLK_w:
 				wallCollision = !wallCollision;

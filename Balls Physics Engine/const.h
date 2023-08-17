@@ -42,7 +42,8 @@ const float SUN_GRAV = 19.6f;
 extern float gravStrength;
 
 const float AIR_RESISTANCE = .002f;
-extern bool airRes;
+const float HIGH_RESISTANCE = .01f;
+extern char airRes;
 extern bool wallCollision;
 extern GravityDirection gravDirection;
 extern Vec2 gravPoint;
