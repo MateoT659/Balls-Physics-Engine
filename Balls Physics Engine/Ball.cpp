@@ -88,17 +88,24 @@ void Ball::renderGhost() {
 	
 	Vec2 pix = getPixelPos();
 
-	for (int w = 0; w < radius * 2; w++)
-	{
-		for (int h = 0; h < radius * 2; h++)
-		{
-			int dx = radius - w; // horizontal offset
-			int dy = radius - h; // vertical offset
-			if ((dx * dx + dy * dy) <= (radius * radius))
-			{
-				SDL_RenderDrawPoint(renderer, (int)pix.x + dx, (int)pix.y + dy);
-			}
+	int x = pix.x, y = pix.y;
+	int dx = radius, dy = 0, prevdx = -1;
+
+	while (dx >= dy) {
+		SDL_RenderDrawLine(renderer, x + dx, y + dy, x - dx, y + dy);
+		if (dy != 0)
+			SDL_RenderDrawLine(renderer, x + dx, y - dy, x - dx, y - dy);
+
+		if (prevdx != dx && dy > 0 && dy != dx) {
+			SDL_RenderDrawLine(renderer, x + dy, y + dx, x - dy, y + dx);
+			SDL_RenderDrawLine(renderer, x + dy, y - dx, x - dy, y - dx);
+			prevdx = dx;
 		}
+		dy++;
+		while (radius * radius < dx * dx + dy * dy) {
+			dx--;
+		}
+
 	}
 }
 void Ball::render() {
@@ -106,17 +113,24 @@ void Ball::render() {
 	
 	Vec2 pix = getPixelPos();
 
-	for (int w = 0; w < radius * 2; w++)
-	{
-		for (int h = 0; h < radius * 2; h++)
-		{
-			int dx = radius - w; // horizontal offset
-			int dy = radius - h; // vertical offset
-			if ((dx * dx + dy * dy) <= (radius * radius))
-			{
-				SDL_RenderDrawPoint(renderer, (int)pix.x + dx, (int)pix.y + dy);
-			}
+	int x = pix.x, y = pix.y;
+	int dx = radius, dy = 0, prevdx = -1;
+
+	while (dx >= dy) {
+		SDL_RenderDrawLine(renderer, x + dx, y + dy, x - dx, y + dy);
+		if (dy != 0)
+			SDL_RenderDrawLine(renderer, x + dx, y - dy, x - dx, y - dy);
+
+		if (prevdx != dx && dy > 0 && dy != dx) {
+			SDL_RenderDrawLine(renderer, x + dy, y + dx, x - dy, y + dx);
+			SDL_RenderDrawLine(renderer, x + dy, y - dx, x - dy, y - dx);
+			prevdx = dx;
 		}
+		dy++;
+		while (radius * radius < dx * dx + dy * dy) {
+			dx--;
+		}
+
 	}
 }
 void Ball::renderSkeleton() {
