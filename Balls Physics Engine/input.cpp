@@ -158,7 +158,7 @@ void parseRunning(SDL_Event* event) {
 }
 
 void parseInput(SDL_Event* event) {
-	if (event->key.keysym.sym == SDLK_ESCAPE) {
+	if (event->key.keysym.sym == SDLK_ESCAPE || event->type == SDL_QUIT) {
 		running = 0; return; //check exit
 	}
 
