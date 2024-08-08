@@ -1,5 +1,7 @@
 # Balls Physics Engine
 
+Study atom structure, simulate fluids, or even play billiards using this particle physics simulator.  This project was made entirely in C++ using the SDL2 graphics engine. Check out my [itch.io page](https://matoe.itch.io/particle-physics) to download!
+
 This project is a particle physics simulation that allows free placement of balls, manipulation of forces, and different gravity settings and supports realistic elastic collisions between objects. To begin manipulating the balls, there are three distinct setting modes:
 
 ### Ball Placement: (Press 'B' to enter | Green Ball Icon):
